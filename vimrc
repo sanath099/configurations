@@ -18,8 +18,9 @@ set hlsearch
 " This also acts as a way to get out
 " of insertmode.
 " Two birds in one stone.
-nnoremap <c-s> :w<CR>
-inoremap <c-s> <Esc>:w<CR>
+inoremap <c-a> <nop>
+nnoremap <c-a> :w<CR>
+inoremap <c-a> <Esc>:w<CR>
 
 " ctrl + q to quit
 :nnoremap <c-x> :q!<CR> 
@@ -29,7 +30,7 @@ inoremap <c-s> <Esc>:w<CR>
 let mapleader = "-"
 
 "edit my vimrc file on the go
-nnoremap <leader>ev :vsplit $MYVIMRC<cr>
+nnoremap <leader>ev :split $MYVIMRC<cr>
 
 "source my vimrc file on the go
 nnoremap <leader>sv :source $MYVIMRC<cr>
@@ -42,11 +43,22 @@ nnoremap <leader>sv :source $MYVIMRC<cr>
 iabbrev adn and
 iabbrev waht what
 iabbrev tehn then
+iabbrev p@ printf("=> (%s) line %d, file %s\n", __func__, __LINE__, __FILE__); 
+iabbrev i# #include
+iabbrev if2 if () {<CR>}<esc>k4li
+iabbrev if1 if ()<esc>F(a
 
 iab <buffer> /// /**<cr><cr>/<up><right>
 
 nnoremap <leader>" viw<esc>a"<esc>hbi"<esc>lel
 "nnoremap <leader>f ^iprintf("<esc>f|cl", <esc>:s/|/, /g$a);<esc>
+
+"Delete the word and a space after it
+nnoremap <leader>w diwx
+
+"delete reset of the chars till end of the line
+"and replace it with ; -- use full in c
+nnoremap <leader>; d$a;<esc>
 
 "move to front of the line
 nnoremap H ^
@@ -77,6 +89,27 @@ vim.command("let sm = '%s'" % s)
 EOF
 	echom sm
 endfunction
+
+function! Cgaurd()
+	let l:fname = expand("%:t")
+	let l:fname = substitute(l:fname, '\.', '_', 'g')
+	let l:gname = toupper(l:fname)
+	let l:fname =  "#ifndef " . l:gname 
+	execute "normal" 'ggO'
+	"put is the command to write a
+	"output of a variable to buffer
+	execute "put = '" . fname . "'" 
+	execute "normal" 'ggdd'
+	let l:fname =  "#define " . l:gname 
+	execute "put = '" . fname . "'" 
+	execute "normal" 'G'
+	execute "put = '#endif'"
+endfunction
+
+nnoremap <leader>g :call Cgaurd()<CR>
+
+"Convert the current word into a function definition
+nnoremap <leader>f $a( )<CR>{<CR><CR>}<esc>kkkf(a
 
 augroup autocmds
 "auto cmds are reread everytime you source the
