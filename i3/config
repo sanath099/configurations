@@ -19,8 +19,8 @@ set $mod Mod4
 # right-to-left text rendering, you should instead use pango for rendering and
 # chose a FreeType font, such as:
 #font pango:DejaVu Sans Mono 10
-font pango:Terminus 11px
-font pango: M+ 1m, FontAwesome, 10
+font pango:Terminus 16px
+#font pango: M+ 1m, FontAwesome, 11
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -90,15 +90,18 @@ bindsym Mod1+Print exec scrot -s -e 'mv $f /tmp/ && gimp /tmp/$f' --release
 # focus the child container
 #bindsym $mod+d focus child
 #
+# Get fonts from https://fortawesome.github.io/Font-Awesome/cheatsheet/
+# Video : https://www.youtube.com/watch?v=8-S0cWnLBKg
 set $workspace1 "1: Browser "
 set $workspace2 "2: Terminals "
 set $workspace3 "3: Mails "
+set $workspace4 "4: Chat  "
 
 # switch to workspace
 bindsym $mod+1 workspace $workspace1
 bindsym $mod+2 workspace $workspace2
 bindsym $mod+3 workspace $workspace3
-bindsym $mod+4 workspace 4
+bindsym $mod+4 workspace $workspace4
 bindsym $mod+5 workspace 5
 bindsym $mod+6 workspace 6
 bindsym $mod+7 workspace 7
@@ -110,7 +113,7 @@ bindsym $mod+0 workspace 10
 bindsym $mod+Shift+1 move container to workspace $workspace1
 bindsym $mod+Shift+2 move container to workspace $workspace2
 bindsym $mod+Shift+3 move container to workspace $workspace3
-bindsym $mod+Shift+4 move container to workspace 4
+bindsym $mod+Shift+4 move container to workspace $workspace4
 bindsym $mod+Shift+5 move container to workspace 5
 bindsym $mod+Shift+6 move container to workspace 6
 bindsym $mod+Shift+7 move container to workspace 7
@@ -118,8 +121,23 @@ bindsym $mod+Shift+8 move container to workspace 8
 bindsym $mod+Shift+9 move container to workspace 9
 bindsym $mod+Shift+0 move container to workspace 10
 
-assign [class = "Chromium-browser"] $workspace1
+# Assign workspaces to monitor
+# # Get list of outputs 
+# xrandr --current | grep "\<connected\>"
+# In current setup follow outputs 
+#   DP2-1 DP2-2 DP2-3
+# Best use arandr
+# left - DP2-3
+# Middle - DP2-2 
+# right - DP2-1
+workspace 8 output DP2-3
+
+# use xprop to get class name of the window
+assign [class = "Firefox"] $workspace1
 assign [class = "Thunderbird"] $workspace3
+assign [class = "Mousetweaks"] scratchpad
+assign [class = "Xchat-gnome"] $workspace4
+assign [class = "Meld"] 8
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -174,13 +192,91 @@ bar {
 # -- Experimentation
 #bindcode --release 52 exec gnome-terminal
 bindsym Control+Mod1+l exec i3lock  
-bindsym Control+Mod1+s exec sudo shutdown now  
+bindsym Control+Mod1+s exec sudo shutdown -h now  
+
+for_window [class="Mousetweaks"] floating disable
 
 # Pulse Audio controls
-bindsym Control+equal exec --no-startup-id pactl set-sink-volume 0 +5% #increase sound volume
-bindsym Control+minus exec --no-startup-id pactl set-sink-volume 0 -- -5% #decrease sound volume
-bindsym Control+0 exec --no-startup-id pactl set-sink-mute 0 toggle # mute sound
+#Find your card with
+#
+#cat /proc/asound/cards
+#
+#and then create /etc/asound.conf with following:
+#
+#pcm.!default {
+#    type hw
+#    card 1
+#}
+#
+#ctl.!default {
+#    type hw           
+#    card 1
+#}
+#
+#Replace "card 1" with the number of your card determined above.
+#bindsym Control+Mod1+equal exec --no-startup-id pactl set-sink-volume 0 +5% #increase sound volume
+#bindsym Control+Mod1+minus exec --no-startup-id pactl set-sink-volume 0 -- -5% #decrease sound volume
+bindsym Control+Mod1+equal exec --no-startup-id amixer sset 'Master' 5%+
+bindsym Control+Mod1+minus exec --no-startup-id amixer sset 'Master' 5%-
+bindsym Control+Mod1+9 exec --no-startup-id ~/scripts/speaker_unmute 
+bindsym Control+Mod1+0 exec --no-startup-id ~/scripts/speaker_mute
 
-exec chromium-browser
-exec thunderbird
-exec_always feh --bg-scale /home/coder/Pictures/wallpaper1.jpg 
+
+bindsym Control+0 exec --no-startup-id pactl set-sink-mute 0 toggle # mute sound
+#bindsym $mod+p exec --no-startup-id /home/coder/scripts/screen_shot
+bindsym $mod+m exec --no-startup-id sudo mousetweaks --dwell --dwell-time=0.4 --threshold=30 --daemonize
+bindsym $mod+o exec --no-startup-id sudo mousetweaks -s
+bindsym --release F9 exec --no-startup-id /home/user/scripts/xdotool_vim_grep
+bindsym --release F7 exec --no-startup-id /home/user/scripts/xdotool_highlight_copy
+bindsym --release F8 exec --no-startup-id /home/user/scripts/xdotool_highlight_paste
+bindsym --release F12 exec --no-startup-id /home/user/scripts/xdotool_copy_edit
+#bindsym --release Control+Mod1+x exec --no-startup-id <path to xdotool script>
+
+#Move worspace to monitors
+bindsym --release Control+Mod1+Left move workspace to output left
+bindsym --release Control+Mod1+Right move workspace to output right
+#lock and sleep
+
+# sending keys to virtualbox
+# See keys @ http://www.win.tue.nl/~aeb/linux/kbd/scancodes-1.html
+# first key is the keycode for the key and the second one is release 
+# code which is key | 0x80
+# F7 is mapped to F8 on Dragon naturally speaking hotkeys to enable/disable mic
+#bindsym F7 exec --no-startup-id VBoxManage controlvm virtual-win8 keyboardputscancode 42 c2 
+
+# autokey
+
+#exec --no-startup-id autokey
+#exec --no-startup-id /home/coder/code/aenea/aenea/server/linux_x11/server_x11.py -d
+#exec VBoxManage startvm virtual-win8
+#exec workrave
+#exec xset r rate 1200 900
+#exec_always feh --bg-scale <path to pic>
+#exec_always ~/scripts/remap_keys 
+
+#todo
+bindsym $mod+t exec --no-startup-id /home/user/scripts/gtodo 
+
+#wifi connection
+#Will first need to save the saved connection
+#using ubuntu gui network manager
+#exec_always --no-startup-id nmcli c up <wifi ssid>
+
+# use arandr to get these outputs
+# default: laptop
+#exec_always --no-startup-id  xrandr --output VIRTUAL1 --off --output eDP1 --off --output DP1 --off --output DP2-1 --off --output DP2-2 --off --output DP2-3 --mode 1920x1080 --pos 0x0 --rotate normal --output HDMI2 --off --output HDMI1 --off --output DP2 --off
+
+# $mod => windows
+# Mod1 => Alt
+# Ctrl => control
+bindsym --release $mod+Mod1+l exec --no-startup-id gnome-screensaver-command -l  
+
+#blender
+bindsym --release F3 exec --no-startup-id /home/user/scripts/xdotool_middle_mouse_down
+bindsym --release F4 exec --no-startup-id /home/user/scripts/xdotool_shift_middle_mouse_down
+bindsym --release F5 exec --no-startup-id /home/user/scripts/xdotool_left_mouse_down
+#bindsym --release F6 exec --no-startup-id /home/user/scripts/xdotool_left_mouse_up
+#
+#
+#
+for_window [title="root@brm-snt1-05:~"] client.focused #4c7899 #285577 #ffffff #2e9ef4 #285577
