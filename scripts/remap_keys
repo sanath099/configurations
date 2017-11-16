@@ -1,0 +1,8 @@
+#!/bin/bash
+
+
+xmodmap -e "clear lock"
+xmodmap -e "keysym 0xff1b = Caps_Lock"
+xmodmap -e "keysym 0xffe5 = Escape"
+xmodmap -e "keysym 0xff13 = Insert"
+

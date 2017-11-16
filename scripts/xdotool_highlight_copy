@@ -1,0 +1,4 @@
+#!/bin/bash
+
+xdotool click --repeat 2 1
+xdotool key "ctrl+shift+c"

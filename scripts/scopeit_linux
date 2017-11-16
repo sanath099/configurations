@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -x
+
+
+find ./arch/sparc/ -name "*.[chxsS]" > cscope.files
+find ./drivers/ -name "*.[chxsS]" >> cscope.files
+find ./block/ -name "*.[chxsS]" >> cscope.files
+find ./crypto/ -name "*.[chxsS]" >> cscope.files
+find ./kernel/ -name "*.[chxsS]" >> cscope.files
+find ./fs/ -name "*.[chxsS]" >> cscope.files
+find ./init/ -name "*.[chxsS]" >> cscope.files
+find ./include/ -name "*.[chxsS]" >> cscope.files
+find ./ipc/ -name "*.[chxsS]" >> cscope.files
+find ./lib/ -name "*.[chxsS]" >> cscope.files
+find ./mm/ -name "*.[chxsS]" >> cscope.files
+find ./security/ -name "*.[chxsS]" >> cscope.files
+find ./sound/ -name "*.[chxsS]" >> cscope.files
+
+cscope -b

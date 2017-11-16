@@ -1,0 +1,5 @@
+#!/bin/bash
+set -x
+
+cat ~/.ssh/id_rsa.pub | ssh $1 'cat >> .ssh/authorized_keys'
+ssh $1 'chmod 640 .ssh/authorized_keys'
